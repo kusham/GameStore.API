@@ -2,7 +2,7 @@
 
 namespace GamesStore.API.Repositories
 {
-    public class GamesRepository
+    public class GamesRepository : IGamesRepository
     {
         private readonly List<Game> _games = new()
         {
@@ -34,7 +34,7 @@ namespace GamesStore.API.Repositories
                 ImageUrl = "https://placehold.co/100"
             }
         };
-        public List<Game> GetAllGames()
+        public IEnumerable<Game> GetAllGames()
         {
             return _games;
         }

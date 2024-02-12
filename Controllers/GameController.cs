@@ -7,26 +7,25 @@ namespace GamesStore.API.Controllers
     {
         const string _getGameEndpointName = "GetGame";
 
-        public static RouteGroupBuilder MapGamesControllers(this IEndpointRouteBuilder routes, GamesRepository
-            _gamesRepository)
+        public static RouteGroupBuilder MapGamesControllers(this IEndpointRouteBuilder routes)
         {
             var group = routes.MapGroup("/games").WithParameterValidation();
 
-            group.MapGet("/", () => _gamesRepository.GetAllGames());
+            group.MapGet("/", (IGamesRepository _gamesRepository) => _gamesRepository.GetAllGames());
 
-            group.MapGet("/{id:int}", (int id) =>
+            group.MapGet("/{id:int}", (IGamesRepository _gamesRepository, int id) =>
             {
                 Game? game = _gamesRepository.GetGameById(id);
                 return game is not null ? Results.Ok(game) : Results.NotFound();
             }).WithName(_getGameEndpointName);
 
-            group.MapPost("/", (Game game) =>
+            group.MapPost("/", (IGamesRepository _gamesRepository, Game game) =>
             {
                 _gamesRepository.AddGame(game);
                 return Results.Created($"/games/{game.Id}", game);
-            }).WithName(_getGameEndpointName);
+            });
 
-            group.MapPut("/{id:int}", (int id, Game game) =>
+            group.MapPut("/{id:int}", (IGamesRepository _gamesRepository, int id, Game game) =>
             {
                 if (id != game.Id)
                 {
@@ -40,7 +39,7 @@ namespace GamesStore.API.Controllers
                 return Results.NoContent();
             });
 
-            group.MapDelete("/{id:int}", (int id) =>
+            group.MapDelete("/{id:int}", (IGamesRepository _gamesRepository, int id) =>
             {
                 if (_gamesRepository.GetGameById(id) is null)
                 {
