@@ -1,15 +1,13 @@
 using GamesStore.API.Controllers;
 using GamesStore.API.Data;
-using GamesStore.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IGamesRepository, GamesRepository>();
-builder.Services.AddSqlServer<GameStoreDbContext>
-    (builder.Configuration.GetConnectionString("GameStoreContext"));
+builder.Services.AddRepositories(builder.Configuration);
 
 var app = builder.Build();
 
+await app.Services.InitializeDb();
 app.MapGamesControllers();
 
 app.Run();
