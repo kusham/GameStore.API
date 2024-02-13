@@ -8,6 +8,7 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$sa_password" -p 1433:1433 -
 ```
 
 # Dotnet
+```powershell
 dotnet new web -n GameStore.API
 dotnet add package [package Name]
 
@@ -18,6 +19,7 @@ dotnet tool install --global dotnet-ef
 dotnet ef migrations add [Name for Migration] --output-dir Data/Migrations
 dotnet ef migrations remove
 dotnet ef database update
+```
 
 ## Setting the connection string to secret manager
 ```powershell	
