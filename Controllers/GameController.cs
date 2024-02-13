@@ -12,24 +12,29 @@ namespace GamesStore.API.Controllers
         {
             var group = routes.MapGroup("/games").WithParameterValidation();
 
-            group.MapGet("/", (IGamesRepository _gamesRepository) => _gamesRepository.GetAllGames().Select(game => game.AsDto()));
+            group.MapGet("/", async (IGamesRepository _gamesRepository) => 
+            (await _gamesRepository.GetAllGamesAsync()).Select(game => game.AsDto()));
 
-            group.MapGet("/{id:int}", (IGamesRepository _gamesRepository, int id) =>
+            group.MapGet("/{id:int}", async (IGamesRepository _gamesRepository, int id) =>
             {
-                Game? game = _gamesRepository.GetGameById(id);
+                Game? game = await _gamesRepository.GetGameByIdAsync(id);
                 return game is not null ? Results.Ok(game) : Results.NotFound();
             }).WithName(_getGameEndpointName);
 
-            group.MapPost("/", (IGamesRepository _gamesRepository, CreateGameDto gameDto) =>
+            group.MapPost("/", async (IGamesRepository _gamesRepository, CreateGameDto gameDto) =>
             {
-                Game game = new() { Genre = gameDto.Genre, Name = gameDto.Name, Price = gameDto.Price, ImageUrl = gameDto.ImageUrl, ReleaseDate = gameDto.ReleaseDate };
-                _gamesRepository.AddGame(game);
+                Game game = new() 
+                { 
+                    Genre = gameDto.Genre, Name = gameDto.Name, Price = gameDto.Price, 
+                    ImageUrl = gameDto.ImageUrl, ReleaseDate = gameDto.ReleaseDate 
+                };
+                await _gamesRepository.AddGameAsync(game);
                 return Results.Created($"/games/{game.Id}", game);
             });
 
-            group.MapPut("/{id:int}", (IGamesRepository _gamesRepository, int id, UpdateGameDto updatedGameDto) =>
+            group.MapPut("/{id:int}", async (IGamesRepository _gamesRepository, int id, UpdateGameDto updatedGameDto) =>
             {
-                Game? existingGame = _gamesRepository.GetGameById(id);
+                Game? existingGame = await _gamesRepository.GetGameByIdAsync(id);
                 if (existingGame is null)
                 {
                     return Results.NotFound();
@@ -40,17 +45,17 @@ namespace GamesStore.API.Controllers
                 existingGame.ReleaseDate = updatedGameDto.ReleaseDate;
                 existingGame.ImageUrl = updatedGameDto.ImageUrl;
 
-                _gamesRepository.UpdateGame(existingGame);
+                await _gamesRepository.UpdateGameAsync(existingGame);
                 return Results.NoContent();
             });
 
-            group.MapDelete("/{id:int}", (IGamesRepository _gamesRepository, int id) =>
+            group.MapDelete("/{id:int}", async (IGamesRepository _gamesRepository, int id) =>
             {
-                if (_gamesRepository.GetGameById(id) is null)
+                if (_gamesRepository.GetGameByIdAsync(id) is null)
                 {
                     return Results.NotFound();
                 }
-                _gamesRepository.DeleteGame(id);
+                await _gamesRepository.DeleteGameAsync(id);
                 return Results.NoContent();
             });
 

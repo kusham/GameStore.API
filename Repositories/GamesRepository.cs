@@ -34,21 +34,22 @@ namespace GamesStore.API.Repositories
                 ImageUrl = "https://placehold.co/100"
             }
         };
-        public IEnumerable<Game> GetAllGames()
+        public async Task<IEnumerable<Game>> GetAllGamesAsync()
         {
-            return _games;
+            return await Task.FromResult(_games);
         }
-        public Game? GetGameById(int id)
+        public async Task<Game?> GetGameByIdAsync(int id)
         {
-            return _games.FirstOrDefault(game => game.Id == id);
+            return await Task.FromResult(_games.FirstOrDefault(game => game.Id == id));
         }
-        public void AddGame(Game game)
+        public async Task AddGameAsync(Game game)
         {
             game.Id = _games.Max(game => game.Id) + 1;
             _games.Add(game);
+            await Task.CompletedTask;
         }
 
-        public void UpdateGame(Game updatedGame)
+        public async Task UpdateGameAsync(Game updatedGame)
         {
             var existingGame = _games.FirstOrDefault(game => game.Id == updatedGame.Id);
             if (existingGame != null)
@@ -59,14 +60,16 @@ namespace GamesStore.API.Repositories
                 existingGame.ReleaseDate = updatedGame.ReleaseDate;
                 existingGame.ImageUrl = updatedGame.ImageUrl;
             }
+            await Task.CompletedTask;
         }
-        public void DeleteGame(int id)
+        public async Task DeleteGameAsync(int id)
         {
             var game = _games.FirstOrDefault(game => game.Id == id);
             if (game != null)
             {
                 _games.Remove(game);
             }
+            await Task.CompletedTask;
         }
 
     }
